@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Jordanzuo/goutil/logUtil"
 	"github.com/polariseye/PolarServer/Server/ServerBase"
 )
 
@@ -13,14 +14,17 @@ import (
 type WebServerStruct struct {
 	ServerBase.ServerBaseStruct
 
+	// 类名
+	className string
+
 	// 服务实例
 	serverInstance *http.Server
 
 	// 运行端口
 	port int32
 
-	// 处理对象
-	handler IRequestHandler
+	// 路由对象
+	serveMux *http.ServeMux
 }
 
 // 开启服务
@@ -51,6 +55,13 @@ func (this *WebServerStruct) Start(onstopFun ServerBase.OnStopFun) error {
 	}()
 
 	return nil
+}
+
+// 添加路由
+// routerUrl:路由地址
+// handler:处理函数
+func (this *WebServerStruct) AddRouter(routerUrl string, handler func(http.ResponseWriter, *http.Request)) {
+	this.serveMux.HandleFunc(routerUrl, handler)
 }
 
 // 停止服务
@@ -86,21 +97,34 @@ func (this *WebServerStruct) innerStop(errMsg error) {
 // response:应答对象
 // request:请求对象
 func (this *WebServerStruct) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	this.handler.RequestHandle(response, request)
+	defer func() {
+		if data := recover(); data != nil {
+			logUtil.LogUnknownError(data)
+		}
+	}()
+	/* result := fmt.Sprintf(`<html><body>
+			<div>host:%v</div>
+			<div>RequestURI:%v</div>
+			<div>RemoteAddr:%v</div>
+			<div>Referer:%v</div>
+			</body></html>`,
+		request.Host, request.RequestURI, request.RemoteAddr, request.Referer())
+	response.Write(bytes.NewBufferString(result).Bytes())
+	// ControllerManager.RequestHandle(response, request)
+	*/
+	this.serveMux.ServeHTTP(response, request)
 }
 
 // 创建新的web服务对象
 // port:端口
-// _handler:处理函数
 // 返回值:
 // *webServerStruct:新建的对象
-func NewWebServer(port int32, _handler IRequestHandler) *WebServerStruct {
+func NewWebServer(port int32) *WebServerStruct {
 	webServer := &WebServerStruct{}
 
 	webServer.InitBase("Web服务")
 
 	webServer.port = port
-	webServer.handler = _handler
 
 	return webServer
 }

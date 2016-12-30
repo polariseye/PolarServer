@@ -12,7 +12,9 @@ import (
 	"github.com/polariseye/PolarServer/ModuleManage"
 )
 
+// 使用Json形式进行数据格式解析
 type Handle4JsonStruct struct {
+	server *WebServerStruct
 }
 
 // 处理请求
@@ -65,6 +67,9 @@ func (this *Handle4JsonStruct) RequestHandle(response http.ResponseWriter, reque
 }
 
 // 创建新的请求处理对象
-func NewHandle4Json() *Handle4JsonStruct {
-	return &Handle4JsonStruct{}
+// webServer:服务对象
+func NewHandle4Json(webServer *WebServerStruct) *Handle4JsonStruct {
+	return &Handle4JsonStruct{
+		server: webServer,
+	}
 }

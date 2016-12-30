@@ -24,12 +24,11 @@ type serverManagerStruct struct {
 }
 
 // 服务管理对象
-var ServerManager *serverManagerStruct
+var defaultServerManager *serverManagerStruct
 
+// 初始化
 func init() {
-	ServerManager = &serverManagerStruct{}
-	ServerManager.serverData = make(map[string]ServerBase.IServer, 10)
-	ServerManager.dataLocker = &sync.Mutex{}
+	defaultServerManager = NewServerManager()
 }
 
 // 注册服务
@@ -109,4 +108,18 @@ func (this *serverManagerStruct) Stop() error {
 // 等待所有服务停止
 func (this *serverManagerStruct) WaitStop() {
 	this.waitGroup.Wait()
+}
+
+// 创建新的服务管理对象
+func NewServerManager() (serverManager *serverManagerStruct) {
+	serverManager := &serverManagerStruct{}
+	serverManager.serverData = make(map[string]ServerBase.IServer, 10)
+	serverManager.dataLocker = &sync.Mutex{}
+
+	return
+}
+
+// 返回默认的管理对象
+func DefaultManager() *serverManagerStruct {
+	return defaultServerManager
 }
