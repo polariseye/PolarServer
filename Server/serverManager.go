@@ -112,7 +112,7 @@ func (this *serverManagerStruct) WaitStop() {
 
 // 创建新的服务管理对象
 func NewServerManager() (serverManager *serverManagerStruct) {
-	serverManager := &serverManagerStruct{}
+	serverManager = &serverManagerStruct{}
 	serverManager.serverData = make(map[string]ServerBase.IServer, 10)
 	serverManager.dataLocker = &sync.Mutex{}
 

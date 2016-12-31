@@ -1,8 +1,7 @@
 package ModuleManage
 
 import (
-	"github.com/polariseye/PolarServer/Common"
-	"github.com/polariseye/PolarServer/Common/ErrorCode"
+	"sort"
 )
 
 // 模块管理结构
@@ -42,7 +41,7 @@ const (
 	NormalModule = 1
 
 	// Api模块
-	ApiModile = 2
+	ApiModule = 2
 )
 
 // 模块管理对象
@@ -61,13 +60,6 @@ func newModuleManager() *moduleManagerStruct {
 	}
 }
 
-func Invoke(request *Common.RequestModel) (result *Common.ResultModel, errMsg error) {
-	//todo:待完善
-	result = Common.NewResultModel(ErrorCode.DataError("还未实现"))
-
-	return result
-}
-
 // 注册模块对象
 // module:模块对象
 // priority:优先级
@@ -76,9 +68,8 @@ func RegisterModule(module IModule, priority Priority, moduleType ModuleType) {
 
 	// 添加到api模块中
 	switch moduleType {
-	case ApiModile:
-		moduleManager.apiModule = append(moduleManager.apiModule, module)
-		break
+	case ApiModule:
+		ApiModuleManager.AddApiModule(module)
 	}
 
 	// 添加到总模块管理对象中
@@ -90,5 +81,76 @@ func RegisterModule(module IModule, priority Priority, moduleType ModuleType) {
 	// 追加到按照优先级划分的所有模块综合那个
 	moduleByPriority = append(moduleByPriority, module)
 
+	// 保存到全局对象
 	moduleManager.moduleData[priority] = moduleByPriority
+}
+
+// 初始化所有模块
+// 返回值:
+// []error:错误信息
+func InitModule() []error {
+	// 获取所有优先级
+	keys := make([]int, 0, len(moduleManager.moduleData))
+	for keyItem, _ := range moduleManager.moduleData {
+		keys = append(keys, int(keyItem))
+	}
+
+	sort.Ints(keys)
+
+	// 错误列表
+	errorList := make([]error, 0, 100)
+	for index := len(keys) - 1; index >= 0; index++ {
+		moduleArray, _ := moduleManager.moduleData[Priority(keys[index])]
+		errorList = append(errorList, initModuleByArray(moduleArray)...)
+	}
+
+	return errorList
+}
+
+// 按照数组形式初始化模块
+// moduleArray:模块列表
+// 返回值:
+// []error:错误信息
+func initModuleByArray(moduleArray []IModule) []error {
+	errorList := make([]error, 0, 100)
+
+	for _, item := range moduleArray {
+		// 初始化
+		switch item.(type) {
+		case IIniter:
+			{
+				initer := item.(IIniter)
+				tmpErr := initer.Init()
+				if tmpErr != nil && len(tmpErr) > 0 {
+					errorList = append(errorList, tmpErr...)
+				}
+			}
+		}
+
+		// Check
+		switch item.(type) {
+		case IChecker:
+			{
+				checker := item.(IChecker)
+				tmpErr := checker.Check()
+				if tmpErr != nil && len(tmpErr) > 0 {
+					errorList = append(errorList, tmpErr...)
+				}
+			}
+		}
+
+		// 转换
+		switch item.(type) {
+		case IConvertor:
+			{
+				convertor := item.(IConvertor)
+				tmpErr := convertor.Convert()
+				if tmpErr != nil && len(tmpErr) > 0 {
+					errorList = append(errorList, tmpErr...)
+				}
+			}
+		}
+	}
+
+	return errorList
 }

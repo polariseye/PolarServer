@@ -6,5 +6,5 @@ type IConvertor interface {
 	Name() string
 
 	// 类型转换
-	Convert() []string
+	Convert() []error
 }

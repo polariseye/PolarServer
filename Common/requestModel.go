@@ -19,7 +19,7 @@ type RequestModel struct {
 	Ip string
 
 	// 请求内容
-	Data typeUtil.MapData
+	Data []interface{}
 
 	// 扩展请求数据
 	ExtensionString typeUtil.MapData
@@ -31,7 +31,7 @@ type RequestModel struct {
 // 创建新的请求对象
 func NewRequestModel() *RequestModel {
 	return &RequestModel{
-		Data:            typeUtil.NewMapData(),
+		Data:            make([]interface{}, 0),
 		ExtensionString: typeUtil.NewMapData(),
 	}
 }
