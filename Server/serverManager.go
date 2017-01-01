@@ -1,17 +1,17 @@
-package Server
+package server
 
 import (
 	"errors"
 	"sync"
 
-	"github.com/polariseye/PolarServer/Server/ServerBase"
+	"github.com/polariseye/PolarServer/server/serverBase"
 )
 
 // 服务管理对象
 type serverManagerStruct struct {
 
 	// 服务列表
-	serverData map[string]ServerBase.IServer
+	serverData map[string]serverBase.IServer
 
 	// 同步对象
 	dataLocker sync.Locker
@@ -33,7 +33,7 @@ func init() {
 
 // 注册服务
 // server:需要注册的服务
-func (this *serverManagerStruct) Register(server ServerBase.IServer) {
+func (this *serverManagerStruct) Register(server serverBase.IServer) {
 	this.dataLocker.Lock()
 	defer this.dataLocker.Unlock()
 
@@ -71,7 +71,7 @@ func (this *serverManagerStruct) Start() error {
 
 // 服务停止时，触发的动作
 // serverInstance：已停止的服务
-func (this *serverManagerStruct) onServerStop(serverInstance ServerBase.IServer) {
+func (this *serverManagerStruct) onServerStop(serverInstance serverBase.IServer) {
 	this.dataLocker.Lock()
 	defer this.dataLocker.Unlock()
 
@@ -113,7 +113,7 @@ func (this *serverManagerStruct) WaitStop() {
 // 创建新的服务管理对象
 func NewServerManager() (serverManager *serverManagerStruct) {
 	serverManager = &serverManagerStruct{}
-	serverManager.serverData = make(map[string]ServerBase.IServer, 10)
+	serverManager.serverData = make(map[string]serverBase.IServer, 10)
 	serverManager.dataLocker = &sync.Mutex{}
 
 	return

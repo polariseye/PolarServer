@@ -1,4 +1,4 @@
 /*
 配置项
 */
-package Config
+package config

@@ -1,11 +1,11 @@
-package Server
+package server
 
 import (
 	"github.com/polariseye/PolarServer/Server/WebServer"
 )
 
 var (
-	WebServerObj *WebServer.WebServerStruct
+	WebServerObj *webServer.WebServerStruct
 )
 
 // 初始化
@@ -16,8 +16,8 @@ func init() {
 // 初始化web服务
 func InitWebServer() {
 	// web服务初始化
-	handle4UrlItem := WebServer.NewHandle4Url()
-	WebServerObj = WebServer.NewWebServer(0)
+	handle4UrlItem := webServer.NewHandle4Url()
+	WebServerObj = webServer.NewWebServer(0)
 	WebServerObj.AddRouter("/Api", handle4UrlItem.RequestHandle)
 
 	// 注册模块

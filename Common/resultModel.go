@@ -1,13 +1,13 @@
-package Common
+package common
 
 import (
-	"github.com/polariseye/PolarServer/Common/ErrorCode"
+	"github.com/polariseye/PolarServer/common/errorCode"
 )
 
 // 请求结果实体对象
 type ResultModel struct {
 	// 状态
-	ErrorCode.ErrorInfo
+	errorCode.ErrorInfo
 
 	// 数据
 	Value map[string]interface{}
@@ -18,7 +18,7 @@ type ResultModel struct {
 
 // 创建新的实体对象
 // defaultErrorCode:默认的错误码信息
-func NewResultModel(defaultErrorCode ErrorCode.ErrorCode) (result *ResultModel) {
+func NewResultModel(defaultErrorCode errorCode.ErrorCode) (result *ResultModel) {
 	result = &ResultModel{
 		Value:  make(map[string]interface{}),
 		Avatar: make(map[string]interface{}),

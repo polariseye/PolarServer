@@ -1,4 +1,4 @@
-package WebServer
+package apiHandle
 
 import (
 	"bytes"
@@ -8,20 +8,25 @@ import (
 
 	"github.com/Jordanzuo/goutil/logUtil"
 	"github.com/Jordanzuo/goutil/webUtil"
-	"github.com/polariseye/PolarServer/Common"
-	"github.com/polariseye/PolarServer/Common/ErrorCode"
-	"github.com/polariseye/PolarServer/ModuleManage"
+	"github.com/polariseye/PolarServer/common"
+	"github.com/polariseye/PolarServer/common/errorCode"
+	"github.com/polariseye/PolarServer/server/webServer"
 )
 
 // 使用Json形式进行数据格式解析
 type Handle4JsonStruct struct {
-	server *WebServerStruct
+	// 服务对象
+	server *webServer.WebServerStruct
+
+	// Api调用对象
+	caller IApiCaller
 }
 
 // 处理请求
+// response:应答对象
+// request:请求对象
 func (this *Handle4JsonStruct) RequestHandle(response http.ResponseWriter, request *http.Request) {
-
-	result := Common.NewResultModel(ErrorCode.ClientDataError)
+	result := common.NewResultModel(errorCode.ClientDataError)
 
 	// 对象序列化
 	defer func() {
@@ -29,7 +34,7 @@ func (this *Handle4JsonStruct) RequestHandle(response http.ResponseWriter, reque
 			logUtil.LogUnknownError(panicErr)
 
 			// 设置数据错误
-			result.SetNormalError(ErrorCode.DataError)
+			result.SetNormalError(errorCode.DataError)
 		}
 
 		data, tmpErrMsg := json.Marshal(&result)
@@ -45,17 +50,17 @@ func (this *Handle4JsonStruct) RequestHandle(response http.ResponseWriter, reque
 	buf := bytes.NewBuffer(nil)
 	dataLen, err := buf.ReadFrom(request.Body)
 	if err != nil {
-		result.SetError(ErrorCode.DataError, "read request data error")
+		result.SetError(errorCode.DataError, "read request data error")
 		return
 	} else if dataLen <= 0 {
-		result.SetError(ErrorCode.DataError, "have no request data")
+		result.SetError(errorCode.DataError, "have no request data")
 		return
 	}
 
 	// 反序列化
-	requestModel := Common.NewRequestModel()
+	requestModel := common.NewRequestModel()
 	if err = json.Unmarshal(buf.Bytes(), &requestModel); err != nil {
-		result.SetError(ErrorCode.DataError, "json format error")
+		result.SetError(errorCode.DataError, "json format error")
 		return
 	}
 
@@ -64,15 +69,18 @@ func (this *Handle4JsonStruct) RequestHandle(response http.ResponseWriter, reque
 	requestModel.Ip = webUtil.GetRequestIP(request)
 
 	// 请求具体处理
-	result = ModuleManage.ApiModuleManager.Call(requestModel)
+	result = this.caller.Call(requestModel)
 }
 
 // 设置目标服务对象
-func (this *Handle4JsonStruct) SetTargetServer(server *WebServerStruct) {
+func (this *Handle4JsonStruct) SetTargetServer(server *webServer.WebServerStruct) {
 	this.server = server
 }
 
 // 创建新的请求处理对象
-func NewHandle4Json() *Handle4JsonStruct {
-	return &Handle4JsonStruct{}
+// _caller:调用对象
+func NewHandle4Json(_caller IApiCaller) *Handle4JsonStruct {
+	return &Handle4JsonStruct{
+		caller: _caller,
+	}
 }

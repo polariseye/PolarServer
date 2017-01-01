@@ -1,4 +1,4 @@
-package ModuleManage
+package moduleManage
 
 // 初始化接口
 type IIniter interface {

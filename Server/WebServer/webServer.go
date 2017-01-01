@@ -1,4 +1,4 @@
-package WebServer
+package webServer
 
 import (
 	"errors"
@@ -7,12 +7,12 @@ import (
 	"net/http"
 
 	"github.com/Jordanzuo/goutil/logUtil"
-	"github.com/polariseye/PolarServer/Server/ServerBase"
+	"github.com/polariseye/PolarServer/server/serverBase"
 )
 
 // web服务结构体
 type WebServerStruct struct {
-	ServerBase.ServerBaseStruct
+	serverBase.ServerBaseStruct
 
 	// 类名
 	className string
@@ -31,7 +31,7 @@ type WebServerStruct struct {
 // onstopFun：服务停止时，运行的函数
 // 返回值：
 // error:错误信息
-func (this *WebServerStruct) Start(onstopFun ServerBase.OnStopFun) error {
+func (this *WebServerStruct) Start(onstopFun serverBase.OnStopFun) error {
 	this.Locker().Lock()
 	defer this.Locker().Unlock()
 

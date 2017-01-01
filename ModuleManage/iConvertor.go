@@ -1,4 +1,4 @@
-package ModuleManage
+package moduleManage
 
 // 动态数据接口
 type IConvertor interface {

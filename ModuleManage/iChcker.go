@@ -1,4 +1,4 @@
-package ModuleManage
+package moduleManage
 
 // 模块接口
 type IChecker interface {

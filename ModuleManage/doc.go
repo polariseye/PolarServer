@@ -1,4 +1,4 @@
 /*
 模块管理
 */
-package ModuleManage
+package moduleManage

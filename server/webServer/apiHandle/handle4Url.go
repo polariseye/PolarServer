@@ -1,4 +1,4 @@
-package WebServer
+package apiHandle
 
 import (
 	"encoding/json"
@@ -7,18 +7,25 @@ import (
 
 	"github.com/Jordanzuo/goutil/logUtil"
 	"github.com/Jordanzuo/goutil/webUtil"
-	"github.com/polariseye/PolarServer/Common"
-	"github.com/polariseye/PolarServer/Common/ErrorCode"
-	"github.com/polariseye/PolarServer/ModuleManage"
+	"github.com/polariseye/PolarServer/common"
+	"github.com/polariseye/PolarServer/common/errorCode"
+	"github.com/polariseye/PolarServer/server/webServer"
 )
 
+// url形式的数据处理
 type Handle4UrlStruct struct {
+	// 服务对象
+	server *webServer.WebServerStruct
+
+	// Api调用对象
+	caller IApiCaller
 }
 
 // 处理请求
+// response:应答对象
+// request:请求对象
 func (this *Handle4UrlStruct) RequestHandle(response http.ResponseWriter, request *http.Request) {
-
-	result := Common.NewResultModel(ErrorCode.DataError)
+	result := common.NewResultModel(errorCode.DataError)
 
 	// 对象序列化
 	defer func() {
@@ -26,7 +33,7 @@ func (this *Handle4UrlStruct) RequestHandle(response http.ResponseWriter, reques
 			logUtil.LogUnknownError(panicErr)
 
 			// 设置数据错误
-			result.SetError(ErrorCode.DataError, "unknown error")
+			result.SetError(errorCode.DataError, "unknown error")
 		}
 
 		data, tmpErrMsg := json.Marshal(&result)
@@ -40,7 +47,7 @@ func (this *Handle4UrlStruct) RequestHandle(response http.ResponseWriter, reques
 
 	// 转换为form表单
 	if tmpErr := request.ParseForm(); tmpErr != nil {
-		result.SetError(ErrorCode.DataError, "form parse error")
+		result.SetError(errorCode.DataError, "form parse error")
 		return
 	}
 
@@ -58,7 +65,7 @@ func (this *Handle4UrlStruct) RequestHandle(response http.ResponseWriter, reques
 		requestInfos = append(requestInfos, tmpVal)
 	}
 
-	requsetModel := Common.NewRequestModel()
+	requsetModel := common.NewRequestModel()
 	requsetModel.Request = request
 	requsetModel.Ip = webUtil.GetRequestIP(request)
 	requsetModel.ModuleName = request.FormValue("ModuleName")
@@ -67,10 +74,16 @@ func (this *Handle4UrlStruct) RequestHandle(response http.ResponseWriter, reques
 	requsetModel.Data = requestInfos
 
 	// 请求具体处理
-	result = ModuleManage.ApiModuleManager.Call(requsetModel)
+	result = this.caller.Call(requsetModel)
+}
+
+// 设置目标服务对象
+func (this *Handle4UrlStruct) SetTargetServer(server *webServer.WebServerStruct) {
+	this.server = server
 }
 
 // 创建新的请求处理对象
-func NewHandle4Url() *Handle4UrlStruct {
+// _caller:调用对象
+func NewHandle4Url(_caller IApiCaller) *Handle4UrlStruct {
 	return &Handle4UrlStruct{}
 }

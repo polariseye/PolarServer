@@ -1,4 +1,4 @@
-package ModuleManage
+package moduleManage
 
 // 模块名接口
 type IModule interface {

@@ -1,4 +1,4 @@
-package ModuleManage
+package moduleManage
 
 import (
 	"sort"
@@ -69,7 +69,7 @@ func RegisterModule(module IModule, priority Priority, moduleType ModuleType) {
 	// 添加到api模块中
 	switch moduleType {
 	case ApiModule:
-		ApiModuleManager.AddApiModule(module)
+		DefaulApiModuleManager.AddApiModule(module)
 	}
 
 	// 添加到总模块管理对象中

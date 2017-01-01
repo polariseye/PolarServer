@@ -1,4 +1,4 @@
-package ErrorCode
+package errorCode
 
 var (
 	// 调用成功

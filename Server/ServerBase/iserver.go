@@ -1,4 +1,4 @@
-package ServerBase
+package serverBase
 
 // 服务停止事件
 type OnStopFun func(serverInstance IServer)

@@ -1,4 +1,4 @@
-package ErrorCode
+package errorCode
 
 // 错误码数据
 type ErrorCode struct {

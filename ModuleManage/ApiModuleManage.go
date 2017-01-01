@@ -1,12 +1,12 @@
-package ModuleManage
+package moduleManage
 
 import (
 	"fmt"
 	"reflect"
 	"strings"
 
-	"github.com/polariseye/PolarServer/Common"
-	"github.com/polariseye/PolarServer/Common/ErrorCode"
+	"github.com/polariseye/PolarServer/common"
+	"github.com/polariseye/PolarServer/common/errorCode"
 )
 
 // api模块结构
@@ -15,7 +15,7 @@ type apiModuleManagerStruct struct {
 	clientMethodData map[string]*MethodAndInOutTypes
 
 	// 额外对象获取函数
-	extraObjGetFun func(*Common.RequestModel) []interface{}
+	extraObjGetFun func(*common.RequestModel) []interface{}
 }
 
 const (
@@ -33,18 +33,18 @@ var (
 	// 结果模型类型
 	resultModelType reflect.Type
 	// Api模块管理对象
-	ApiModuleManager *apiModuleManagerStruct
+	DefaulApiModuleManager *apiModuleManagerStruct
 )
 
+// 初始化
 func init() {
 	// 初始化结果类型
-	result := Common.NewResultModel(ErrorCode.Success)
+	result := common.NewResultModel(errorCode.Success)
 	resultModelType = reflect.TypeOf(result)
-	ApiModuleManager = NewApiModuleManager()
+	DefaulApiModuleManager = NewApiModuleManager()
 }
 
-// 模块初始化
-// module:待初始化的模块
+// 添加模块
 func (this *apiModuleManagerStruct) AddApiModule(module IModule) {
 	// 获取structObject对应的反射 Type 和 Value
 	reflectValue := reflect.ValueOf(module)
@@ -87,14 +87,14 @@ func (this *apiModuleManagerStruct) AddApiModule(module IModule) {
 
 // 方法调用
 // request:请求参数
-func (this *apiModuleManagerStruct) Call(request *Common.RequestModel) (result *Common.ResultModel) {
-	result = Common.NewResultModel(ErrorCode.ClientDataError)
+func (this *apiModuleManagerStruct) Call(request *common.RequestModel) (result *common.ResultModel) {
+	result = common.NewResultModel(errorCode.ClientDataError)
 
 	// 获取方法
 	methodFullName := this.getFullMethodName(request.ModuleName, request.MethodName)
 	targetMethod, isExist := this.clientMethodData[methodFullName]
 	if isExist == false {
-		result.SetError(ErrorCode.MethodNoExist, fmt.Sprintf("未找到module"))
+		result.SetError(errorCode.MethodNoExist, fmt.Sprintf("未找到module"))
 		return
 	}
 
@@ -112,7 +112,7 @@ func (this *apiModuleManagerStruct) Call(request *Common.RequestModel) (result *
 	// 请求参数转换成调用参数
 	invokeParam, errMsg := targetMethod.GetCallParams(requestparam)
 	if errMsg != nil {
-		result.SetError(ErrorCode.DataError, errMsg.Error())
+		result.SetError(errorCode.DataError, errMsg.Error())
 
 		return
 	}
@@ -124,11 +124,11 @@ func (this *apiModuleManagerStruct) Call(request *Common.RequestModel) (result *
 	// 获取返回结果
 	methodResult := invokeResult[0].Interface()
 
-	return methodResult.(*Common.ResultModel)
+	return methodResult.(*common.ResultModel)
 }
 
 // 设置获取额外对象的函数
-func (this *apiModuleManagerStruct) SetExtraObjGetFun(_extraObjGetFun func(*Common.RequestModel) []interface{}) {
+func (this *apiModuleManagerStruct) SetExtraObjGetFun(_extraObjGetFun func(*common.RequestModel) []interface{}) {
 	this.extraObjGetFun = _extraObjGetFun
 }
 

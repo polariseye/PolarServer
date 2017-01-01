@@ -1,4 +1,4 @@
-package ServerBase
+package serverBase
 
 import (
 	"sync"
