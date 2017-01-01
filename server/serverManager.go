@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/polariseye/PolarServer/server/serverBase"
+	"github.com/polariseye/polarserver/server/serverBase"
 )
 
 // 服务管理对象

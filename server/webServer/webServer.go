@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/Jordanzuo/goutil/logUtil"
-	"github.com/polariseye/PolarServer/server/serverBase"
+	"github.com/polariseye/polarserver/server/serverBase"
 )
 
 // web服务结构体

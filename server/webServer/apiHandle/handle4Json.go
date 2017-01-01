@@ -8,9 +8,9 @@ import (
 
 	"github.com/Jordanzuo/goutil/logUtil"
 	"github.com/Jordanzuo/goutil/webUtil"
-	"github.com/polariseye/PolarServer/common"
-	"github.com/polariseye/PolarServer/common/errorCode"
-	"github.com/polariseye/PolarServer/server/webServer"
+	"github.com/polariseye/polarserver/common"
+	"github.com/polariseye/polarserver/common/errorCode"
+	"github.com/polariseye/polarserver/server/webServer"
 )
 
 // 使用Json形式进行数据格式解析

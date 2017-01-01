@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/polariseye/PolarServer/common"
-	"github.com/polariseye/PolarServer/common/errorCode"
+	"github.com/polariseye/polarserver/common"
+	"github.com/polariseye/polarserver/common/errorCode"
 )
 
 // api模块结构

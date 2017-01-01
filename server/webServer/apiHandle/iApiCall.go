@@ -1,7 +1,7 @@
 package apiHandle
 
 import (
-	"github.com/polariseye/PolarServer/common"
+	"github.com/polariseye/polarserver/common"
 )
 
 // Api调用接口

@@ -1,7 +1,7 @@
 package common
 
 import (
-	"github.com/polariseye/PolarServer/common/errorCode"
+	"github.com/polariseye/polarserver/common/errorCode"
 )
 
 // 请求结果实体对象
