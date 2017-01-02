@@ -77,7 +77,7 @@ func initWebServerFromConfig(config config.Configer) {
 	webServerObj = webServer.NewWebServer(int32(port), "web 服务")
 
 	// 初始化Api处理
-	handler := apiHandle.NewHandle4Url(moduleManage.DefaulApiModuleManager)
+	handler := apiHandle.NewHandle4Json(moduleManage.DefaulApiModuleManager)
 	webServerObj.AddRouter("/Api", handler.RequestHandle)
 
 	// 注册模块
