@@ -99,9 +99,14 @@ func InitModule() []error {
 
 	// 错误列表
 	errorList := make([]error, 0, 100)
-	for index := len(keys) - 1; index >= 0; index++ {
+	for index := len(keys) - 1; index >= 0; index-- {
 		moduleArray, _ := moduleManager.moduleData[Priority(keys[index])]
-		errorList = append(errorList, initModuleByArray(moduleArray)...)
+
+		// 按模块初始化
+		tmpErrorList := initModuleByArray(moduleArray)
+		if tmpErrorList != nil && len(tmpErrorList) > 0 {
+			errorList = append(errorList, tmpErrorList...)
+		}
 	}
 
 	return errorList
@@ -120,7 +125,7 @@ func initModuleByArray(moduleArray []IModule) []error {
 		case IIniter:
 			{
 				initer := item.(IIniter)
-				tmpErr := initer.Init()
+				tmpErr := initer.InitModule()
 				if tmpErr != nil && len(tmpErr) > 0 {
 					errorList = append(errorList, tmpErr...)
 				}
@@ -132,7 +137,7 @@ func initModuleByArray(moduleArray []IModule) []error {
 		case IChecker:
 			{
 				checker := item.(IChecker)
-				tmpErr := checker.Check()
+				tmpErr := checker.CheckModule()
 				if tmpErr != nil && len(tmpErr) > 0 {
 					errorList = append(errorList, tmpErr...)
 				}
@@ -144,7 +149,7 @@ func initModuleByArray(moduleArray []IModule) []error {
 		case IConvertor:
 			{
 				convertor := item.(IConvertor)
-				tmpErr := convertor.Convert()
+				tmpErr := convertor.ConvertModule()
 				if tmpErr != nil && len(tmpErr) > 0 {
 					errorList = append(errorList, tmpErr...)
 				}

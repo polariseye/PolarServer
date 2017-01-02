@@ -14,9 +14,6 @@ import (
 type WebServerStruct struct {
 	serverBase.ServerBaseStruct
 
-	// 类名
-	className string
-
 	// 服务实例
 	serverInstance *http.Server
 
@@ -46,6 +43,7 @@ func (this *WebServerStruct) Start(onstopFun serverBase.OnStopFun) error {
 
 	this.serverInstance = &serverInstance
 
+	logUtil.LogAndPrint(fmt.Sprintf("服务名:%v 监听端口:%v", this.Name(), this.port), logUtil.Info)
 	go func() {
 		// 开启监听
 		if tmpErr := serverInstance.ListenAndServe(); tmpErr != nil {
@@ -116,15 +114,17 @@ func (this *WebServerStruct) ServeHTTP(response http.ResponseWriter, request *ht
 }
 
 // 创建新的web服务对象
-// port:端口
+// _port:端口
+// serverName:服务名
 // 返回值:
 // *webServerStruct:新建的对象
-func NewWebServer(port int32) *WebServerStruct {
-	webServer := &WebServerStruct{}
+func NewWebServer(_port int32, serverName string) *WebServerStruct {
+	webServer := &WebServerStruct{
+		serveMux: http.NewServeMux(),
+		port:     _port,
+	}
 
 	webServer.InitBase("Web服务")
-
-	webServer.port = port
 
 	return webServer
 }

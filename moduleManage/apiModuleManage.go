@@ -81,12 +81,16 @@ func (this *apiModuleManagerStruct) AddApiModule(module IModule) {
 		}
 
 		// 添加到列表中
-		this.clientMethodData[this.getFullMethodName(module.Name(), methodName)] = NewMethodAndInOutTypes(method, inTypes, outTypes)
+		methodName = strings.TrimLeft(methodName, methodPrefix)
+		tmpModuleName := strings.TrimRight(module.Name(), moduleSuffix)
+		this.clientMethodData[this.getFullMethodName(tmpModuleName, methodName)] = NewMethodAndInOutTypes(method, inTypes, outTypes)
 	}
 }
 
 // 方法调用
 // request:请求参数
+// 返回值:
+// result:结果对象
 func (this *apiModuleManagerStruct) Call(request *common.RequestModel) (result *common.ResultModel) {
 	result = common.NewResultModel(errorCode.ClientDataError)
 
@@ -94,7 +98,7 @@ func (this *apiModuleManagerStruct) Call(request *common.RequestModel) (result *
 	methodFullName := this.getFullMethodName(request.ModuleName, request.MethodName)
 	targetMethod, isExist := this.clientMethodData[methodFullName]
 	if isExist == false {
-		result.SetError(errorCode.MethodNoExist, fmt.Sprintf("未找到module"))
+		result.SetError(errorCode.MethodNoExist, fmt.Sprintf("未找到调用方法"))
 		return
 	}
 
@@ -128,6 +132,7 @@ func (this *apiModuleManagerStruct) Call(request *common.RequestModel) (result *
 }
 
 // 设置获取额外对象的函数
+// _extraObjGetFun:额外实体获取函数
 func (this *apiModuleManagerStruct) SetExtraObjGetFun(_extraObjGetFun func(*common.RequestModel) []interface{}) {
 	this.extraObjGetFun = _extraObjGetFun
 }
@@ -170,12 +175,12 @@ func (this *apiModuleManagerStruct) getFullModuleName(moduleName string) string 
 }
 
 // 获取完整的方法名称
-// structName：结构体名称
+// moduleName：结构体名称
 // methodName：方法名称
 // 返回值：
 // 完整的方法名称
-func (this *apiModuleManagerStruct) getFullMethodName(structName, methodName string) string {
-	return structName + seperator + methodName
+func (this *apiModuleManagerStruct) getFullMethodName(moduleName, methodName string) string {
+	return moduleName + moduleSuffix + seperator + methodName
 }
 
 // 创建新的api模块管理对象

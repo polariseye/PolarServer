@@ -1,8 +1,6 @@
 package common
 
 import (
-	"net/http"
-
 	"github.com/Jordanzuo/goutil/typeUtil"
 )
 
@@ -25,7 +23,7 @@ type RequestModel struct {
 	ExtensionString typeUtil.MapData
 
 	// 请求的对象
-	Request *http.Request
+	Request interface{}
 }
 
 // 创建新的请求对象

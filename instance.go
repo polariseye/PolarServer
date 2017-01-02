@@ -3,6 +3,7 @@ package polarserver
 import (
 	"fmt"
 
+	"github.com/Jordanzuo/goutil/logUtil"
 	_ "github.com/polariseye/polarserver/common"
 	"github.com/polariseye/polarserver/config"
 	"github.com/polariseye/polarserver/dataBase"
@@ -13,6 +14,9 @@ import (
 )
 
 var (
+	// 服务管理对象
+	serverManagerObj *server.ServerManagerStruct
+
 	// web服务对象
 	webServerObj *webServer.WebServerStruct
 
@@ -24,6 +28,11 @@ var (
 )
 
 // 初始化
+func init() {
+	serverManagerObj = server.NewServerManager()
+}
+
+// 初始化
 // configFileName:配置文件名
 // errMsg:错误信息
 func Init(configFileName string) (errMsg error) {
@@ -32,6 +41,10 @@ func Init(configFileName string) (errMsg error) {
 		return
 	}
 
+	// 初始化日志记录
+	logUtil.SetLogPath(configObj.DefaultString("LogPath", "DefaultLogPath/"))
+
+	// 配置初始化
 	errMsg = initDataBaseFromConfig(configObj)
 	if errMsg != nil {
 		return errMsg
@@ -47,6 +60,11 @@ func WebServerObj() *webServer.WebServerStruct {
 	return webServerObj
 }
 
+// 服务管理对象
+func ServerManagerObj() *server.ServerManagerStruct {
+	return serverManagerObj
+}
+
 // 配置对象
 func ConfigObj() config.Configer {
 	return configObj
@@ -56,14 +74,14 @@ func ConfigObj() config.Configer {
 func initWebServerFromConfig(config config.Configer) {
 	// web服务初始化
 	port := config.DefaultInt("WebPort", 2017)
-	webServerObj = webServer.NewWebServer(int32(port))
+	webServerObj = webServer.NewWebServer(int32(port), "web 服务")
 
 	// 初始化Api处理
 	handler := apiHandle.NewHandle4Url(moduleManage.DefaulApiModuleManager)
 	webServerObj.AddRouter("/Api", handler.RequestHandle)
 
 	// 注册模块
-	server.DefaultManager().Register(webServerObj)
+	ServerManagerObj().Register(webServerObj)
 }
 
 // 从配置文件初始化数据库
@@ -78,12 +96,12 @@ func initDataBaseFromConfig(config config.Configer) error {
 	}
 
 	for key, connectionInfo := range connectionData {
-		connectionItem, isOk := connectionInfo.(map[string]string)
+		connectionItem, isOk := connectionInfo.(map[string]interface{})
 		if isOk == false {
 			return fmt.Errorf("数据库配置不合法,节点：DbConnection.%v", key)
 		}
 
-		var driver, connectionString string
+		var driver, connectionString interface{}
 
 		driver, isOk = connectionItem["Driver"]
 		if isOk == false {
@@ -95,7 +113,7 @@ func initDataBaseFromConfig(config config.Configer) error {
 			return fmt.Errorf("数据库配置不合法,不存在节点：DbConnection.%v.ConnectionString", key)
 		}
 
-		errMsg = dataBase.AddConnection(key, driver, connectionString)
+		errMsg = dataBase.AddConnection(key, driver.(string), connectionString.(string))
 		if errMsg != nil {
 			return errMsg
 		}

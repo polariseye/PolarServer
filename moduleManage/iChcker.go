@@ -6,5 +6,5 @@ type IChecker interface {
 	Name() string
 
 	// 数据检查
-	Check() []error
+	CheckModule() []error
 }

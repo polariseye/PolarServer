@@ -6,5 +6,5 @@ type IIniter interface {
 	Name() string
 
 	// 初始化
-	Init() []error
+	InitModule() []error
 }

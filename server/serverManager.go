@@ -2,13 +2,15 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
+	"github.com/Jordanzuo/goutil/logUtil"
 	"github.com/polariseye/polarserver/server/serverBase"
 )
 
 // 服务管理对象
-type serverManagerStruct struct {
+type ServerManagerStruct struct {
 
 	// 服务列表
 	serverData map[string]serverBase.IServer
@@ -23,17 +25,9 @@ type serverManagerStruct struct {
 	waitGroup sync.WaitGroup
 }
 
-// 服务管理对象
-var defaultServerManager *serverManagerStruct
-
-// 初始化
-func init() {
-	defaultServerManager = NewServerManager()
-}
-
 // 注册服务
 // server:需要注册的服务
-func (this *serverManagerStruct) Register(server serverBase.IServer) {
+func (this *ServerManagerStruct) Register(server serverBase.IServer) {
 	this.dataLocker.Lock()
 	defer this.dataLocker.Unlock()
 
@@ -42,7 +36,7 @@ func (this *serverManagerStruct) Register(server serverBase.IServer) {
 
 // 开始运行服务
 // error:服务运行的错误信息
-func (this *serverManagerStruct) Start() error {
+func (this *ServerManagerStruct) Start() error {
 	this.dataLocker.Lock()
 	defer this.dataLocker.Unlock()
 
@@ -57,10 +51,12 @@ func (this *serverManagerStruct) Start() error {
 	for _, item := range this.serverData {
 
 		// 服务开启异常
+		logUtil.LogAndPrint(fmt.Sprintf("开始初始化服务, 服务名:%v", item.Name()), logUtil.Info)
 		if errMsg := item.Start(this.onServerStop); errMsg != nil {
 			return errMsg
 		}
 
+		logUtil.LogAndPrint(fmt.Sprintf("服务初始化完成, 服务名:%v", item.Name()), logUtil.Info)
 		this.waitGroup.Add(1)
 	}
 
@@ -71,7 +67,7 @@ func (this *serverManagerStruct) Start() error {
 
 // 服务停止时，触发的动作
 // serverInstance：已停止的服务
-func (this *serverManagerStruct) onServerStop(serverInstance serverBase.IServer) {
+func (this *ServerManagerStruct) onServerStop(serverInstance serverBase.IServer) {
 	this.dataLocker.Lock()
 	defer this.dataLocker.Unlock()
 
@@ -84,7 +80,7 @@ func (this *serverManagerStruct) onServerStop(serverInstance serverBase.IServer)
 }
 
 // 停止所有服务
-func (this *serverManagerStruct) Stop() error {
+func (this *ServerManagerStruct) Stop() error {
 	this.dataLocker.Lock()
 	defer this.dataLocker.Unlock()
 
@@ -106,20 +102,15 @@ func (this *serverManagerStruct) Stop() error {
 }
 
 // 等待所有服务停止
-func (this *serverManagerStruct) WaitStop() {
+func (this *ServerManagerStruct) WaitStop() {
 	this.waitGroup.Wait()
 }
 
 // 创建新的服务管理对象
-func NewServerManager() (serverManager *serverManagerStruct) {
-	serverManager = &serverManagerStruct{}
+func NewServerManager() (serverManager *ServerManagerStruct) {
+	serverManager = &ServerManagerStruct{}
 	serverManager.serverData = make(map[string]serverBase.IServer, 10)
 	serverManager.dataLocker = &sync.Mutex{}
 
 	return
-}
-
-// 返回默认的管理对象
-func DefaultManager() *serverManagerStruct {
-	return defaultServerManager
 }
