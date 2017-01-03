@@ -9,6 +9,7 @@ import (
 	"github.com/Jordanzuo/goutil/webUtil"
 	"github.com/polariseye/polarserver/common"
 	"github.com/polariseye/polarserver/common/errorCode"
+	"github.com/polariseye/polarserver/server/serverBase"
 	"github.com/polariseye/polarserver/server/webServer"
 )
 
@@ -18,7 +19,7 @@ type Handle4UrlStruct struct {
 	server *webServer.WebServerStruct
 
 	// Api调用对象
-	caller IApiCaller
+	caller serverBase.IApiCaller
 }
 
 // 处理请求
@@ -84,6 +85,6 @@ func (this *Handle4UrlStruct) SetTargetServer(server *webServer.WebServerStruct)
 
 // 创建新的请求处理对象
 // _caller:调用对象
-func NewHandle4Url(_caller IApiCaller) *Handle4UrlStruct {
+func NewHandle4Url(_caller serverBase.IApiCaller) *Handle4UrlStruct {
 	return &Handle4UrlStruct{}
 }
