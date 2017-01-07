@@ -78,59 +78,59 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				}
 			*/
 		case reflect.Bool:
-			if param_bool, ok := typeUtil.Bool(paramItem); ok {
+			if param_bool, errMsg := typeUtil.Bool(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(param_bool)
 			}
 		case reflect.Int:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(int(param_float64))
 			}
 		case reflect.Int8:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(int8(param_float64))
 			}
 		case reflect.Int16:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(int16(param_float64))
 			}
 		case reflect.Int32:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(int32(param_float64))
 			}
 		case reflect.Int64:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(int64(param_float64))
 			}
 		case reflect.Uint:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(uint(param_float64))
 			}
 		case reflect.Uint8:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(uint8(param_float64))
 			}
 		case reflect.Uint16:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(uint16(param_float64))
 			}
 		case reflect.Uint32:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(uint32(param_float64))
 			}
 		case reflect.Uint64:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(uint64(param_float64))
 			}
 		case reflect.Float32:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(float32(param_float64))
 			}
 		case reflect.Float64:
-			if param_float64, ok := typeUtil.Float64(paramItem); ok {
+			if param_float64, errMsg := typeUtil.Float64(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(param_float64)
 			}
 		case reflect.String:
-			if param_string, ok := typeUtil.String(paramItem); ok {
+			if param_string, errMsg := typeUtil.String(paramItem); errMsg == nil {
 				in[i] = reflect.ValueOf(param_string)
 			}
 		case reflect.Slice:
@@ -140,7 +140,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]bool":
 					params_inner := make([]bool, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_bool, ok := typeUtil.Bool(param_interface[i]); ok {
+						if param_bool, tmpErrMsg := typeUtil.Bool(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = param_bool
 						}
 					}
@@ -149,7 +149,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]int":
 					params_inner := make([]int, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = int(param_float64)
 						}
 					}
@@ -157,7 +157,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]int8":
 					params_inner := make([]int8, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = int8(param_float64)
 						}
 					}
@@ -165,7 +165,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]int16":
 					params_inner := make([]int16, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = int16(param_float64)
 						}
 					}
@@ -173,7 +173,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]int32":
 					params_inner := make([]int32, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = int32(param_float64)
 						}
 					}
@@ -181,7 +181,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]int64":
 					params_inner := make([]int64, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = int64(param_float64)
 						}
 					}
@@ -189,7 +189,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]uint":
 					params_inner := make([]uint, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = uint(param_float64)
 						}
 					}
@@ -198,7 +198,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]uint16":
 					params_inner := make([]uint16, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = uint16(param_float64)
 						}
 					}
@@ -206,7 +206,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]uint32":
 					params_inner := make([]uint32, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = uint32(param_float64)
 						}
 					}
@@ -214,7 +214,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]uint64":
 					params_inner := make([]uint64, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = uint64(param_float64)
 						}
 					}
@@ -222,7 +222,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]float32":
 					params_inner := make([]float32, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = float32(param_float64)
 						}
 					}
@@ -230,7 +230,7 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]float64":
 					params_inner := make([]float64, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_float64, ok := typeUtil.Float64(param_interface[i]); ok {
+						if param_float64, tmpErrMsg := typeUtil.Float64(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = param_float64
 						}
 					}
@@ -238,14 +238,14 @@ func (this *MethodAndInOutTypes) GetCallParams(paramData []interface{}) ([]refle
 				case "[]string":
 					params_inner := make([]string, len(param_interface))
 					for i := 0; i < len(param_interface); i++ {
-						if param_string, ok := typeUtil.String(param_interface[i]); ok {
+						if param_string, tmpErrMsg := typeUtil.String(param_interface[i]); tmpErrMsg == nil {
 							params_inner[i] = param_string
 						}
 					}
 					in[i] = reflect.ValueOf(params_inner)
 				}
 			} else if inTypeItem.String() == "[]uint8" { // 由于[]uint8在传输过程中会被转化成字符串，所以单独处理;
-				if param_string, ok := typeUtil.String(paramItem); ok {
+				if param_string, tmpErrMsg := typeUtil.String(paramItem); tmpErrMsg == nil {
 					param_uint8 := ([]uint8)(param_string)
 					in[i] = reflect.ValueOf(param_uint8)
 				}
