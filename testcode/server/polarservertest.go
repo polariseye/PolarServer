@@ -13,6 +13,7 @@ func main() {
 	if errMsg := polarserver.Init("app.config"); errMsg != nil {
 		fmt.Printf("配置文件初始化错误,错误信息:%v", errMsg)
 
+		ConfigTest()
 		return
 	}
 
@@ -44,4 +45,16 @@ func main() {
 	fmt.Println(result)
 
 	polarserver.ServerManagerObj().WaitStop()
+}
+
+func ConfigTest() {
+	fmt.Println("")
+	configObj := polarserver.ConfigObj()
+	node := configObj.Node("/Config/WebPort")
+	if node == nil {
+		fmt.Println("node is nil")
+		return
+	}
+
+	fmt.Println("找到了：", node.NodeName)
 }
