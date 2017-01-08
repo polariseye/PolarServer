@@ -21,7 +21,7 @@ class RequestModel:
         return result
 
 # 服务器地址
-serverAddr = "http://127.0.0.1:20016/Api"
+serverAddr = "http://127.0.0.1:20016/Api/Client"
 
 # 调用接口
 def Request(moduleName,methodName,value):

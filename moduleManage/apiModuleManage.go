@@ -4,36 +4,40 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"sync"
 
+	"github.com/Jordanzuo/goutil/stringUtil"
 	"github.com/polariseye/polarserver/common"
 	"github.com/polariseye/polarserver/common/errorCode"
 )
 
 // api模块结构
-type apiModuleManagerStruct struct {
+type ApiModuleManagerStruct struct {
 	// 客户端函数列表
 	clientMethodData map[string]*MethodAndInOutTypes
 
+	// 客户端函数同步锁
+	methodDataLocker *sync.RWMutex
+
 	// 额外对象获取函数
 	extraObjGetFun func(*common.RequestModel) []interface{}
-}
 
-const (
 	// 模块名后缀
-	moduleSuffix = "BLL"
+	moduleSuffix string
 
 	// 客户端函数前缀
-	methodPrefix = "C_"
+	methodPrefix string
 
 	// 分隔符
-	seperator = "_"
-)
+	seperator string
+
+	// 测试函数的后缀
+	testMethodPrefix string
+}
 
 var (
 	// 结果模型类型
 	resultModelType reflect.Type
-	// Api模块管理对象
-	DefaulApiModuleManager *apiModuleManagerStruct
 )
 
 // 初始化
@@ -41,17 +45,16 @@ func init() {
 	// 初始化结果类型
 	result := common.NewResultModel(errorCode.Success)
 	resultModelType = reflect.TypeOf(result)
-	DefaulApiModuleManager = NewApiModuleManager()
 }
 
-// 添加模块
-func (this *apiModuleManagerStruct) AddApiModule(module IModule) {
+// 添加模块(可重复调用)
+func (this *ApiModuleManagerStruct) AddApiModule(module IModule) {
 	// 获取structObject对应的反射 Type 和 Value
 	reflectValue := reflect.ValueOf(module)
 	reflectType := reflect.TypeOf(module)
 
 	// 检查模块名的后缀
-	if strings.HasSuffix(module.Name(), moduleSuffix) == false {
+	if strings.HasSuffix(module.Name(), this.moduleSuffix) == false {
 		return
 	}
 
@@ -61,7 +64,10 @@ func (this *apiModuleManagerStruct) AddApiModule(module IModule) {
 		methodName := reflectType.Method(i).Name
 
 		// 判断是否为导出的方法
-		if strings.HasPrefix(methodName, methodPrefix) == false {
+		if strings.HasPrefix(methodName, this.methodPrefix) == false &&
+			common.IsTest() &&
+			strings.HasPrefix(methodName, this.testMethodPrefix) == false {
+
 			continue
 		}
 
@@ -81,9 +87,20 @@ func (this *apiModuleManagerStruct) AddApiModule(module IModule) {
 		}
 
 		// 添加到列表中
-		methodName = strings.TrimLeft(methodName, methodPrefix)
-		tmpModuleName := strings.TrimRight(module.Name(), moduleSuffix)
-		this.clientMethodData[this.getFullMethodName(tmpModuleName, methodName)] = NewMethodAndInOutTypes(method, inTypes, outTypes)
+		methodName = strings.TrimLeft(methodName, this.methodPrefix)
+		if common.IsTest() {
+			methodName = strings.TrimLeft(methodName, this.testMethodPrefix)
+		}
+
+		tmpModuleName := strings.TrimRight(module.Name(), this.moduleSuffix)
+
+		// 更新缓存
+		func() {
+			this.methodDataLocker.Lock()
+			defer this.methodDataLocker.Unlock()
+
+			this.clientMethodData[this.getFullMethodName(tmpModuleName, methodName)] = NewMethodAndInOutTypes(method, inTypes, outTypes)
+		}()
 	}
 }
 
@@ -91,12 +108,11 @@ func (this *apiModuleManagerStruct) AddApiModule(module IModule) {
 // request:请求参数
 // 返回值:
 // result:结果对象
-func (this *apiModuleManagerStruct) Call(request *common.RequestModel) (result *common.ResultModel) {
+func (this *ApiModuleManagerStruct) Call(request *common.RequestModel) (result *common.ResultModel) {
 	result = common.NewResultModel(errorCode.ClientDataError)
 
 	// 获取方法
-	methodFullName := this.getFullMethodName(request.ModuleName, request.MethodName)
-	targetMethod, isExist := this.clientMethodData[methodFullName]
+	targetMethod, isExist := this.getCallMethod(request.ModuleName, request.MethodName)
 	if isExist == false {
 		result.SetError(errorCode.MethodNoExist, fmt.Sprintf("未找到调用方法"))
 		return
@@ -133,8 +149,26 @@ func (this *apiModuleManagerStruct) Call(request *common.RequestModel) (result *
 
 // 设置获取额外对象的函数
 // _extraObjGetFun:额外实体获取函数
-func (this *apiModuleManagerStruct) SetExtraObjGetFun(_extraObjGetFun func(*common.RequestModel) []interface{}) {
+func (this *ApiModuleManagerStruct) SetExtraObjGetFun(_extraObjGetFun func(*common.RequestModel) []interface{}) {
 	this.extraObjGetFun = _extraObjGetFun
+}
+
+// 获取调用函数
+// moduleName:模块名
+// methodName:方法名
+// 返回值:
+// *MethodAndInOutTypes:调用方法
+// bool:是否存在
+func (this *ApiModuleManagerStruct) getCallMethod(moduleName, methodName string) (*MethodAndInOutTypes, bool) {
+	// 方法完整名
+	methodFullName := this.getFullMethodName(moduleName, methodName)
+
+	// 进行读锁
+	this.methodDataLocker.RLock()
+	defer this.methodDataLocker.RUnlock()
+
+	result, isExist := this.clientMethodData[methodFullName]
+	return result, isExist
 }
 
 // 解析方法的输入输出参数
@@ -142,7 +176,7 @@ func (this *apiModuleManagerStruct) SetExtraObjGetFun(_extraObjGetFun func(*comm
 // 返回值：
 // 输入参数类型集合
 // 输出参数类型集合
-func (this *apiModuleManagerStruct) resolveMethodInOutParams(method reflect.Value) (inTypes []reflect.Type, outTypes []reflect.Type) {
+func (this *ApiModuleManagerStruct) resolveMethodInOutParams(method reflect.Value) (inTypes []reflect.Type, outTypes []reflect.Type) {
 	methodType := method.Type()
 	for i := 0; i < methodType.NumIn(); i++ {
 		inTypes = append(inTypes, methodType.In(i))
@@ -159,7 +193,7 @@ func (this *apiModuleManagerStruct) resolveMethodInOutParams(method reflect.Valu
 // structType：结构体类型
 // 返回值：
 // 结构体类型的名称
-func (this *apiModuleManagerStruct) getStructName(structType reflect.Type) string {
+func (this *ApiModuleManagerStruct) getStructName(structType reflect.Type) string {
 	reflectTypeStr := structType.String()
 	reflectTypeArr := strings.Split(reflectTypeStr, ".")
 
@@ -170,8 +204,8 @@ func (this *apiModuleManagerStruct) getStructName(structType reflect.Type) strin
 // moduleName：模块名称
 // 返回值：
 // 完整的模块名称
-func (this *apiModuleManagerStruct) getFullModuleName(moduleName string) string {
-	return moduleName + moduleSuffix
+func (this *ApiModuleManagerStruct) getFullModuleName(moduleName string) string {
+	return moduleName + this.moduleSuffix
 }
 
 // 获取完整的方法名称
@@ -179,14 +213,40 @@ func (this *apiModuleManagerStruct) getFullModuleName(moduleName string) string 
 // methodName：方法名称
 // 返回值：
 // 完整的方法名称
-func (this *apiModuleManagerStruct) getFullMethodName(moduleName, methodName string) string {
-	return moduleName + moduleSuffix + seperator + methodName
+func (this *ApiModuleManagerStruct) getFullMethodName(moduleName, methodName string) string {
+	fmt.Println(moduleName + this.moduleSuffix + this.seperator + methodName)
+	return moduleName + this.moduleSuffix + this.seperator + methodName
+}
+
+// 设置函数前缀名
+// prefix:函数前缀
+func (this *ApiModuleManagerStruct) SetMethodPrefix(prefix string) {
+	if stringUtil.IsEmpty(prefix) {
+		return
+	}
+
+	this.methodPrefix = prefix
+}
+
+// 设置函数前缀名
+// prefix:函数前缀
+func (this *ApiModuleManagerStruct) SetTestMethodPrefix(prefix string) {
+	if stringUtil.IsEmpty(prefix) {
+		return
+	}
+
+	this.testMethodPrefix = prefix
 }
 
 // 创建新的api模块管理对象
-func NewApiModuleManager() *apiModuleManagerStruct {
-	return &apiModuleManagerStruct{
+func NewApiModuleManager() *ApiModuleManagerStruct {
+	return &ApiModuleManagerStruct{
 		clientMethodData: make(map[string]*MethodAndInOutTypes, 0),
 		extraObjGetFun:   nil,
+		moduleSuffix:     "BLL",
+		methodPrefix:     "C_",
+		seperator:        "_",
+		testMethodPrefix: "Test_",
+		methodDataLocker: &sync.RWMutex{},
 	}
 }

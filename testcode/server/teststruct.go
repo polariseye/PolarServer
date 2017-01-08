@@ -16,7 +16,9 @@ var TestBLL *testStruct
 
 func init() {
 	TestBLL = NewTestStruct()
-	moduleManage.RegisterModule(TestBLL, moduleManage.Normal, moduleManage.ApiModule)
+	moduleManage.RegisterModule(func() (moduleManage.IModule, moduleManage.ModuleType) {
+		return NewTestStruct(), moduleManage.NormalModule
+	})
 }
 
 // 类名

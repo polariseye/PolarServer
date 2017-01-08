@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	"github.com/Jordanzuo/goutil/configUtil"
+	"github.com/Jordanzuo/goutil/debugUtil"
 	"github.com/Jordanzuo/goutil/logUtil"
 	"github.com/Jordanzuo/goutil/xmlUtil"
-	_ "github.com/polariseye/polarserver/common"
+	"github.com/polariseye/polarserver/common"
 	"github.com/polariseye/polarserver/dataBase"
 	"github.com/polariseye/polarserver/moduleManage"
 	"github.com/polariseye/polarserver/server"
@@ -16,7 +17,7 @@ import (
 
 var (
 	// 服务管理对象
-	serverManagerObj *server.ServerManagerStruct
+	serverManagerObj *server.ServerManagerStruct = server.NewServerManager()
 
 	// web服务对象
 	webServerObj *webServer.WebServerStruct
@@ -25,12 +26,24 @@ var (
 	configObj *configUtil.XmlConfig
 
 	// 处理对象
-	handler *apiHandle.Handle4UrlStruct
+	clientHandler *apiHandle.Handle4JsonStruct
+
+	// 客户端Api接口
+	clientApiManager *moduleManage.ApiModuleManagerStruct = moduleManage.NewApiModuleManager()
+
+	// 处理对象
+	manageHandler *apiHandle.Handle4JsonStruct
+
+	// 后端Api接口
+	mangageApiManager *moduleManage.ApiModuleManagerStruct = moduleManage.NewApiModuleManager()
 )
 
-// 初始化
 func init() {
-	serverManagerObj = server.NewServerManager()
+	mangageApiManager.SetMethodPrefix("M_")
+	mangageApiManager.SetTestMethodPrefix("MTest_")
+
+	moduleManage.AddApiManager(clientApiManager)
+	moduleManage.AddApiManager(mangageApiManager)
 }
 
 // 初始化
@@ -47,12 +60,19 @@ func Init(configFileName string) (errMsg error) {
 	// 初始化日志记录
 	logUtil.SetLogPath(configObj.DefaultString("Config/LogPath", "", "DefaultLogPath/"))
 
-	// 配置初始化
+	// 初始化是否是测试模式
+	common.SetIsTest(configObj.DefaultBool("Config/IsTest", "", false))
+
+	// 初始化是否是调试模式
+	debugUtil.SetDebug(configObj.DefaultBool("Config/IsDebug", "", false))
+
+	// 数据库配置初始化
 	errMsg = initDataBaseFromConfig(configObj)
 	if errMsg != nil {
 		return errMsg
 	}
 
+	// web服务配置初始化
 	initWebServerFromConfig(configObj)
 
 	return nil
@@ -79,9 +99,13 @@ func initWebServerFromConfig(config *configUtil.XmlConfig) {
 	port := config.DefaultInt("Config/WebPort", "", 2017)
 	webServerObj = webServer.NewWebServer(int32(port), "web 服务")
 
-	// 初始化Api处理
-	handler := apiHandle.NewHandle4Json(moduleManage.DefaulApiModuleManager)
-	webServerObj.AddRouter("/Api", handler.RequestHandle)
+	// 初始化客户端Api处理
+	clientHandler := apiHandle.NewHandle4Json(clientApiManager)
+	webServerObj.AddRouter("/Api/Client", clientHandler.RequestHandle)
+
+	// 初始化后台api处理
+	manageHandler := apiHandle.NewHandle4Json(mangageApiManager)
+	webServerObj.AddRouter("/Api/Manage", manageHandler.RequestHandle)
 
 	// 注册模块
 	ServerManagerObj().Register(webServerObj)
@@ -115,4 +139,14 @@ func initDataBaseFromConfig(config *configUtil.XmlConfig) error {
 	}
 
 	return nil
+}
+
+// 客户端管理对象
+func ClientApiManager() *moduleManage.ApiModuleManagerStruct {
+	return clientApiManager
+}
+
+// 后端管理对象
+func MangageApiManager() *moduleManage.ApiModuleManagerStruct {
+	return clientApiManager
 }

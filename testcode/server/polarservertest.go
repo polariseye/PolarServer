@@ -32,14 +32,14 @@ func main() {
 	request.ModuleName = "Test"
 	request.MethodName = "Hello"
 
-	moduleManage.DefaulApiModuleManager.SetExtraObjGetFun(func(request *common.RequestModel) []interface{} {
+	polarserver.ClientApiManager().SetExtraObjGetFun(func(request *common.RequestModel) []interface{} {
 		tmpResult := make([]interface{}, 0, 1)
 		tmpResult = append(tmpResult, 2)
 
 		return tmpResult
 	})
 
-	result := moduleManage.DefaulApiModuleManager.Call(request)
+	result := polarserver.ClientApiManager().Call(request)
 	fmt.Println(result.Value["Hello"])
 	fmt.Println("Extra:", result.Value["Extra"])
 	fmt.Println(result)
