@@ -1,4 +1,4 @@
-package config
+package configBll
 
 import (
 	"github.com/polariseye/polarserver/bll/instanceMangeBll/modelData"

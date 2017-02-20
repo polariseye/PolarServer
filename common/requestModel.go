@@ -30,6 +30,6 @@ type RequestModel struct {
 func NewRequestModel() *RequestModel {
 	return &RequestModel{
 		Data:            make([]interface{}, 0),
-		ExtensionString: typeUtil.NewMapData(),
+		ExtensionString: typeUtil.NewMapData(map[string]interface{}{}),
 	}
 }
