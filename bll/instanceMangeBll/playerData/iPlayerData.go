@@ -1,5 +1,5 @@
 package playerData
 
-type IPlayerData struct {
-	ModuleName()string
+type IPlayerData interface {
+	ModuleName() string
 }
