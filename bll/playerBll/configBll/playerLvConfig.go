@@ -2,6 +2,7 @@ package configBll
 
 import (
 	"github.com/polariseye/polarserver/bll/instanceMangeBll/modelData"
+	"github.com/polariseye/polarserver/dal/playerDal/configDal"
 )
 
 type playerLvConfigStruct struct {
@@ -15,6 +16,11 @@ func init() {
 }
 
 func (this *playerLvConfigStruct) Init() []error {
+	table, _ := configDal.PlayerLvConfigDal.GetList()
+	for i := 0; i < table.Len(); i++ {
+		// table.Row(i)
+	}
+
 	return nil
 }
 

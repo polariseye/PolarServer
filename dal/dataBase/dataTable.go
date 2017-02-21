@@ -3,9 +3,6 @@ package dataBase
 import (
 	"database/sql"
 	"errors"
-	"fmt"
-
-	"github.com/Jordanzuo/goutil/stringUtil"
 )
 
 type DataTable struct {
@@ -28,7 +25,7 @@ func (this *DataTable) init(rows *sql.Rows) error {
 	}
 
 	// 读取行数据
-	this.rowData = make([][]interface{})
+	this.rowData = make([]*DataRow, 0)
 	columnCount := len(this.columnNames)
 	for rows.Next() {
 		rowCells := make([]interface{}, columnCount)
@@ -36,6 +33,8 @@ func (this *DataTable) init(rows *sql.Rows) error {
 
 		this.rowData = append(this.rowData, newDataRow(this, rowCells))
 	}
+
+	return nil
 }
 
 func (this *DataTable) CellByIndex(rowIndex int, cellIndex int) (interface{}, error) {
@@ -48,7 +47,7 @@ func (this *DataTable) CellByIndex(rowIndex int, cellIndex int) (interface{}, er
 		return nil, errors.New("column out of range")
 	}
 
-	return rowItem.cells[cellIndex]
+	return rowItem.cells[cellIndex], nil
 }
 
 func (this *DataTable) CellByCellName(rowIndex int, cellName string) (interface{}, error) {
@@ -62,7 +61,7 @@ func (this *DataTable) CellByCellName(rowIndex int, cellName string) (interface{
 	}
 
 	rowItem := this.rowData[rowIndex]
-	return rowItem.cells[cellIndex]
+	return rowItem.cells[cellIndex], nil
 }
 
 func (this *DataTable) Row(rowIndex int) (*DataRow, error) {
@@ -70,7 +69,7 @@ func (this *DataTable) Row(rowIndex int) (*DataRow, error) {
 		return nil, errors.New("row out of range")
 	}
 
-	return this.rowData[rowIndex]
+	return this.rowData[rowIndex], nil
 }
 
 func (this *DataTable) cellIndex(cellName string) int {

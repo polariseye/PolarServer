@@ -23,7 +23,7 @@ func (this *DataRow) Cell(celIndex int) (interface{}, error) {
 		return nil, errors.New("cell out of range")
 	}
 
-	return this.cells[celIndex]
+	return this.cells[celIndex], nil
 }
 
 func (this *DataRow) CellByName(cellName string) (interface{}, error) {
@@ -32,7 +32,7 @@ func (this *DataRow) CellByName(cellName string) (interface{}, error) {
 		return nil, errors.New("cell name no exist")
 	}
 
-	return this.cells[celIndex]
+	return this.cells[celIndex], nil
 }
 
 func newDataRow(_table *DataTable, _cells []interface{}) *DataRow {
