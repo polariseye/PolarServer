@@ -54,7 +54,7 @@ func (this *ApiModuleManagerStruct) AddApiModule(module IModule) {
 	reflectType := reflect.TypeOf(module)
 
 	// 检查模块名的后缀
-	if strings.HasSuffix(module.Name(), this.moduleSuffix) == false {
+	if strings.HasSuffix(module.ModuleName(), this.moduleSuffix) == false {
 		return
 	}
 
@@ -92,7 +92,7 @@ func (this *ApiModuleManagerStruct) AddApiModule(module IModule) {
 			methodName = strings.TrimLeft(methodName, this.testMethodPrefix)
 		}
 
-		tmpModuleName := strings.TrimRight(module.Name(), this.moduleSuffix)
+		tmpModuleName := strings.TrimRight(module.ModuleName(), this.moduleSuffix)
 
 		// 更新缓存
 		func() {
