@@ -2,6 +2,7 @@ package dataBase
 
 import (
 	"errors"
+	"time"
 )
 
 // 数据行结果
@@ -23,7 +24,7 @@ func (this *DataRow) Len() int {
 	return len(this.cells)
 }
 
-// 单元格的字符串值（可能为nil）
+// 单元格的字符串值（可能为nil）,如果有设置连接字符串：parseTime=true，则会有time.Time
 // celIndex:单元格序号
 // 返回值:
 // interface{}:单元格的字符串值
@@ -44,12 +45,14 @@ func (this *DataRow) CellValue(celIndex int) (interface{}, error) {
 		return string(this.cells[celIndex].([]byte)), nil
 	case string:
 		return this.cells[celIndex].(string), nil
+	case time.Time:
+		return this.cells[celIndex].(time.Time), nil
 	}
 
-	return nil, nil
+	return nil, errors.New("unknown value type")
 }
 
-// 单元格的字符串值（可能为nil）
+// 单元格的字符串值（可能为nil）,如果有设置连接字符串：parseTime=true，则会有time.Time
 // cellName:单元格名称
 // 返回值:
 // interface{}:单元格的字符串值
