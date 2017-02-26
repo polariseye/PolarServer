@@ -7,18 +7,18 @@ import (
 	"github.com/polariseye/polarserver/model/player/config"
 )
 
-type playerLvConfigStruct struct {
+type playerLvConfigBll_ struct {
 	playerLvConfigData map[int32]*config.PlayerLvConfig
 }
 
-var PlayerLvConfigBll *playerLvConfigStruct
+var PlayerLvConfigBll *playerLvConfigBll_
 
 func init() {
 	PlayerLvConfigBll = newPlayerLvConfigBll()
 	modelData.Register(PlayerLvConfigBll)
 }
 
-func (this *playerLvConfigStruct) Init() []error {
+func (this *playerLvConfigBll_) Init() []error {
 	errList := make([]error, 0)
 
 	// 获取数据
@@ -51,7 +51,7 @@ func (this *playerLvConfigStruct) Init() []error {
 	return nil
 }
 
-func (this *playerLvConfigStruct) Check() []error {
+func (this *playerLvConfigBll_) Check() []error {
 	errList := make([]error, 0)
 
 	for _, val := range this.playerLvConfigData {
@@ -62,16 +62,16 @@ func (this *playerLvConfigStruct) Check() []error {
 	return errList
 }
 
-func (this *playerLvConfigStruct) Convert() []error {
+func (this *playerLvConfigBll_) Convert() []error {
 	return nil
 }
 
-func (this *playerLvConfigStruct) ModuleName() string {
+func (this *playerLvConfigBll_) ModuleName() string {
 	return "PlayerLvConfigBll"
 }
 
-func newPlayerLvConfigBll() *playerLvConfigStruct {
-	return &playerLvConfigStruct{
+func newPlayerLvConfigBll() *playerLvConfigBll_ {
+	return &playerLvConfigBll_{
 		playerLvConfigData: make(map[int32]*config.PlayerLvConfig),
 	}
 }

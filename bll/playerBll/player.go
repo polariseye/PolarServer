@@ -24,7 +24,6 @@ func (this *playerBll_) ModuleName() string {
 }
 
 func (this *playerBll_) init(playerId string) (result *player.Player, errMsg error) {
-
 	// 获取数据
 	var dt *dbUtil.DataTable
 	dt, errMsg = playerDal.PlayerDal.GetList(playerId)
@@ -45,6 +44,10 @@ func (this *playerBll_) init(playerId string) (result *player.Player, errMsg err
 
 func (this *playerBll_) GetPlayer(playerId string) (result *player.Player, errMsg error) {
 	//todo:如何查找玩家对象
+}
+
+func (this *playerBll_) getPlayerByUserId() {
+
 }
 
 func newPlayerBll() *playerBll_ {
