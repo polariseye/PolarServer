@@ -1,30 +1,44 @@
 package playerDal
 
 import (
-	"github.com/Jordanzuo/goutil/dbUtil"
+	"database/sql"
+
 	"github.com/polariseye/polarserver/dal/dataBase"
+	"github.com/polariseye/polarserver/model/player"
 )
 
-type playerDal_ struct {
-}
+type playerDal_ struct{}
 
 var PlayerDal *playerDal_ = &playerDal_{}
 
-func (this *playerDal_) GetList(playerId string) (*dbUtil.DataTable, error) {
-	sql := "select * from p_player where id=?"
-	result, errMsg := dataBase.GameDb().Query(sql, playerId)
+func (this *playerDal_) GetList(playerId string) (result []*player.Player, errMsg error) {
+	executeSql := "select * from p_player where id=?"
+	var rows *sql.Rows
+	rows, errMsg = dataBase.GameDb().Query(executeSql, playerId)
 	if errMsg != nil {
 		return nil, errMsg
 	}
 
-	return dbUtil.NewDataTable(result)
+	result = make([]*player.Player, 0)
+	defer func() {
+		rows.Close()
+	}()
+
+	for rows.Next() {
+		item := player.NewPlayer()
+		rows.Scan(&item.Exp, &item.Id, &item.Lv, &item.Name, &item.PartnerId, &item.ServerId, &item.UserId)
+
+		result = append(result, item)
+	}
+
+	return
 }
 
-func (this *playerDal_) Update(playerId string, name string, lv int32, exp int) int {
+func (this *playerDal_) Update(item *player.Player) int {
 	return 1
 }
 
-func (this *playerDal_) Insert(playerId string, name string, lv int32, exp int) int {
+func (this *playerDal_) Insert(item *player.Player) int {
 	return 1
 }
 
