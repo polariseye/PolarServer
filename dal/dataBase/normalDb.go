@@ -2,21 +2,21 @@ package dataBase
 
 // 游戏库获取
 // 返回值:
-// *DbConnection:游戏库对象
-func GameDb() *DbConnection {
-	return GetConnection("GameDb")
+// *DbSession:游戏库会话对象
+func GameDb() *DbSession {
+	return NewDbSession(GetConnection("GameDb"))
 }
 
 // model库连接对象获取
 // 返回值:
-// *DbConnection:model库连接对象
-func ModelDb() *DbConnection {
-	return GetConnection("ModelDb")
+// *DbSession:model库会话对象
+func ModelDb() *DbSession {
+	return NewDbSession(GetConnection("ModelDb"))
 }
 
 // 日志库获取
 // 返回值:
-// *DbConnection:日志库连接对象
-func LogDb() *DbConnection {
-	return GetConnection("LogDb")
+// *DbSession:日志库会话对象
+func LogDb() *DbSession {
+	return NewDbSession(GetConnection("LogDb"))
 }

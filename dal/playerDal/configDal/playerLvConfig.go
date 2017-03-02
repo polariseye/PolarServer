@@ -7,15 +7,14 @@ import (
 	"github.com/polariseye/polarserver/model/player/config"
 )
 
-type playerLvConfigDal_ struct {
+type PlayerLvConfigDal struct {
+	dataBase.DalBase
 }
 
-var PlayerLvConfigDal *playerLvConfigDal_ = &playerLvConfigDal_{}
-
-func (this *playerLvConfigDal_) GetList() (result []*config.PlayerLvConfig, errMsg error) {
+func (this *PlayerLvConfigDal) GetList() (result []*config.PlayerLvConfig, errMsg error) {
 	toExecuteSql := "select * from b_player_lv_c"
 	var rows *sql.Rows
-	rows, errMsg = dataBase.GameDb().Query(toExecuteSql)
+	rows, errMsg = this.Session("GameDb").Query(toExecuteSql)
 	if errMsg != nil {
 		return nil, errMsg
 	}
@@ -33,4 +32,9 @@ func (this *playerLvConfigDal_) GetList() (result []*config.PlayerLvConfig, errM
 	}
 
 	return
+}
+
+// 创建新的玩家等级配置对象
+func NewPlayerLvConfigDal() *PlayerLvConfigDal {
+	return &PlayerLvConfigDal{}
 }
